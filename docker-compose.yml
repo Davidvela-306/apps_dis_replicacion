@@ -1,28 +1,28 @@
-version: '3'
+version: "3"
 services:
-  mysql-master:
+  mysql-master01:
     image: mysql:8.0
-    container_name: mysql-master
+    container_name: mysql-master01
     ports:
       - 3306:3306 # Port mapping port:host
     environment: # Environment variables for mysql
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: replica_db
-    command: --server-id=1 --log-bin=mysql-bin --binlog-do-db=master_replica_db # master id= 1 because is the master
-  mysql-slave:
+      MYSQL_DATABASE: replica_db_tc
+    command: --server-id=1 --log-bin=mysql-bin --binlog-do-db=replica_db_tc # master id= 1 because is the master
+  mysql-master02:
     image: mysql:8.0
-    container_name: mysql-slave
+    container_name: mysql-master02
     ports:
-      - 3307:3306 # Port mapping port:host
-    environment: # Environment variables for mysql slave
+      - 3307:3306
+    environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: replica_db # debe ser el mismo nombre del master
-    command: --server-id=2 --log-bin=mysql-bin --binlog-do-db=master_replica_db # slave id= 2 because is the slave
+      MYSQL_DATABASE: replica_db_tc
+    command: --server-id=2 --log-bin=mysql-bin --binlog-do-db=replica_db_tc
   phpmyadmin:
     image: phpmyadmin:latest
     container_name: phpmyadmin01
     ports:
       - 8080:80 # Port mapping port:host
     environment: # names of the mysql containers to connect to phpmyadmin
-      PMA_HOST: "mysql-master,mysql-slave"
+      PMA_HOST: "mysql-master01,mysql-master02"
       PMA_ARBITRARY: 1 # Allow arbitrary server
